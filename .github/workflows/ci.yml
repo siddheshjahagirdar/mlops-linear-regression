@@ -24,8 +24,8 @@ jobs:
         with:
           python-version: 3.10
       - run: pip install -r requirements.txt
-      - run: python src/train.py
-      - run: python src/quantize.py
+      - run: python src/fit_model.py
+      - run: python src/compress_weights.py
 
   build-and-test-container:
     needs: train-and-quantize
