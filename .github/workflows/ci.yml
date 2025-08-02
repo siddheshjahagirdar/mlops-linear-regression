@@ -1,0 +1,36 @@
+name: MLOps CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+      - run: pip install -r requirements.txt
+      - run: pytest
+
+  train-and-quantize:
+    needs: test-suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+      - run: pip install -r requirements.txt
+      - run: python src/train.py
+      - run: python src/quantize.py
+
+  build-and-test-container:
+    needs: train-and-quantize
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker build -t mlops-lr .
+      - run: docker run mlops-lr
